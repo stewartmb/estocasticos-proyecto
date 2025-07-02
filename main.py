@@ -9,7 +9,7 @@ from params import *
 
 n = 1160           # Número de nodos en el grafo
 p = 0.001          # Probabilidad inicial de conexión
-iteraciones = 5000  # Número de modificaciones aleatorias
+iteraciones = 100000  # Número de modificaciones aleatorias
 
 params = paper # Parámetros iniciales
 
