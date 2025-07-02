@@ -1,23 +1,53 @@
 import networkx as nx
+import numpy as np
 import math
 
-def alt_2_path_open_undirected(G):
-    """
-    Cuenta el número de 2-paths abiertos en grafo no dirigido G,
-    es decir, triples (i,j,k) con i-j, j-k, y no i-k.
-    """
-    count = 0
-    for j in G.nodes():
-        neighbors = list(G.neighbors(j))
-        # Chequeamos todos pares (i,k) vecinos de j
-        for idx_i in range(len(neighbors)):
-            for idx_k in range(idx_i + 1, len(neighbors)):
-                i = neighbors[idx_i]
-                k = neighbors[idx_k]
-                # Cuenta solo si NO hay enlace i-k
-                if not G.has_edge(i, k):
-                    count += 1
-    return count
+
+def gwesp_statistic(G, tau=0.25):
+    e_tau = np.exp(tau)
+    factor = 1 - np.exp(-tau)
+    max_i = len(G.nodes) - 2
+
+    # Contador para EP_i
+    ep_counts = {}
+
+    for (u, v) in G.edges():
+        # Vecinos comunes de u y v
+        common_neighbors = list(nx.common_neighbors(G, u, v))
+        i = len(common_neighbors)
+
+        if i > 0:
+            ep_counts[i] = ep_counts.get(i, 0) + 1
+
+    # Calcular la suma ponderada
+    stat_sum = 0.0
+    for i, count in ep_counts.items():
+        weight = 1 - (1 - factor) ** i
+        stat_sum += weight * count
+
+    v_x_tau = e_tau * stat_sum
+    return v_x_tau
+
+
+def gwd_statistic(G, tau=0.25):
+    e_tau = np.exp(tau)
+    factor = 1 - np.exp(-tau)
+
+    # Contar número de nodos con cada grado
+    degrees = dict(G.degree())
+    degree_counts = {}
+
+    for deg in degrees.values():
+        if deg > 0:
+            degree_counts[deg] = degree_counts.get(deg, 0) + 1
+
+    stat_sum = 0.0
+    for i, count in degree_counts.items():
+        weight = 1 - (1 - factor) ** i
+        stat_sum += weight * count
+
+    u_x_tau = e_tau * stat_sum
+    return u_x_tau
 
 
 def calcular_estadisticas_de_red(G):
@@ -26,35 +56,11 @@ def calcular_estadisticas_de_red(G):
     # 1. Número de enlaces (aristas)
     stats['edges'] = G.number_of_edges()
 
-    stats['density'] = nx.density(G)
-
-    # 2. Grado promedio
-    grados = [grado for nodo, grado in G.degree()]
-    stats['degree'] = sum(grados) / len(grados) if grados else 0
-
-    stats['degree<1'] = sum(1 for g in grados if g <= 1)
-
-    # 3. Transitividad (clustering global)
-    stats['transitivity'] = nx.transitivity(G)
-
-    # 4. K-Triángulos (triángulos por nodo, total dividido por 3 para evitar contar 3 veces)
-    tri_por_nodo = nx.triangles(G)
-    stats['triangles'] = sum(tri_por_nodo.values()) // 3
-
-    k_estrella_count = sum(1 for g in grados if g == 3)
-    stats['3-stars'] = k_estrella_count
-
-    k_estrella_count = sum(1 for g in grados if g == 4)
-    stats['4-stars'] = k_estrella_count
-
-    k_estrella_count = sum(1 for g in grados if g >= 5)
-    stats['5+-stars'] = k_estrella_count
-
-    stats['offset'] = 1
-
-    stats['2-paths'] = alt_2_path_open_undirected(G)
+    stats['gwesp'] = gwesp_statistic(G)
+    stats['gwd'] = gwd_statistic(G)
 
     return stats
+
 
 def calcular(G, params, debug=False):
     stats = calcular_estadisticas_de_red(G)
@@ -69,3 +75,48 @@ def calcular(G, params, debug=False):
     if debug:
         print(f"Result: {result}")
     return result
+
+
+def compute_network_statistics(G):
+    """
+    Recibe un grafo networkx G y devuelve un vector (lista) con:
+    [NLC, L, avg_degree, avg_clustering, assortativity, avg_path_length, diameter]
+    """
+    # Extraer mayor componente conexa
+    largest_cc = max(nx.connected_components(G), key=len)
+    G_sub = G.subgraph(largest_cc).copy()
+    
+    # NLC: número de nodos en la mayor componente conexa
+    NLC = len(largest_cc)
+    
+    # L: número de aristas
+    L = G.number_of_edges()
+    
+    # Grado promedio
+    avg_degree = sum(dict(G.degree()).values()) / G.number_of_nodes()
+    
+    # Clustering promedio
+    avg_clustering = nx.average_clustering(G)
+    
+    # Coeficiente de assortativity
+    try:
+        assortativity = nx.degree_pearson_correlation_coefficient(G)
+    except:
+        assortativity = float('nan')  # Si no se puede calcular
+    
+    # Longitud de camino promedio (solo en componente conexa)
+    try:
+        avg_path_length = nx.average_shortest_path_length(G_sub)
+    except:
+        avg_path_length = float('nan')
+    
+    # Diámetro (solo en componente conexa)
+    try:
+        diameter = nx.diameter(G_sub)
+    except:
+        diameter = float('nan')
+    
+    # Devolver como vector (lista)
+    stats_vector = [NLC, L, avg_degree, avg_clustering, assortativity, avg_path_length, diameter]
+    
+    return stats_vector

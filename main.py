@@ -1,17 +1,17 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
-from estadisticas import calcular
+from estadisticas import calcular, compute_network_statistics
 import math
 import copy
 from params import *
 
 
-n = 16           # Número de nodos en el grafo
-p = 0.05          # Probabilidad inicial de conexión
+n = 1160           # Número de nodos en el grafo
+p = 0.001          # Probabilidad inicial de conexión
 iteraciones = 5000  # Número de modificaciones aleatorias
 
-params = no_tris # Parámetros iniciales
+params = paper # Parámetros iniciales
 
 def change(G_propuesto):
     # Proponer un cambio: añadir o quitar una arista
@@ -56,6 +56,7 @@ G = nx.erdos_renyi_graph(n=n, p=p)
 G = mcmc_grafo(G, calcular, params, iteraciones=iteraciones)
 
 print(calcular(G, params))
+print(compute_network_statistics(G))
 
 # Dibujar el grafo final
 plt.figure(figsize=(10, 8))
