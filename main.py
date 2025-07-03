@@ -7,11 +7,11 @@ import copy
 from params import *
 
 
-n = 1160           # Número de nodos en el grafo
-p = 0.001          # Probabilidad inicial de conexión
-iteraciones = 100000  # Número de modificaciones aleatorias
+n = 25           # Número de nodos en el grafo
+p = 0.2          # Probabilidad inicial de conexión
+iteraciones = 5000  # Número de modificaciones aleatorias
 
-params = paper # Parámetros iniciales
+params = g30 # Parámetros iniciales
 
 def change(G_propuesto):
     # Proponer un cambio: añadir o quitar una arista
@@ -59,7 +59,7 @@ print(calcular(G, params))
 print(compute_network_statistics(G))
 
 # Dibujar el grafo final
-plt.figure(figsize=(10, 8))
+plt.figure(figsize=(8, 6))
 nx.draw(
     G,
     with_labels=True,

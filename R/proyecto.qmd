@@ -1,0 +1,22 @@
+```{r}
+library(network)
+library(ergm)
+
+g <- read.table("g30.edgelist")
+net <- network(g, directed = FALSE)
+
+
+
+# Ajustar modelo con términos "edges" y "triangles"
+fit <- ergm(
+  net ~ edges
+        + gwesp(0.25, fixed = TRUE)
+        + gwdegree(0.25, fixed = TRUE),
+  control = control.ergm(MCMLE.maxit = 50,
+                         MCMC.burnin = 1e5,
+                         MCMC.interval = 1e4)
+)
+
+
+summary(fit)
+```
