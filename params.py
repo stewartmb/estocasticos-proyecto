@@ -84,8 +84,7 @@ distant = {
 
 
 
-paper = {
-    'edges': -6.9,
-    'gwesp': 2.4,  # GWESP
-    'gwd': 0.225,    # GWD
+r_params = {
+    'edges': -3.3,
+    'gwesp': 0.8
 }

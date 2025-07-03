@@ -1,0 +1,14 @@
+```{r}
+library(network)
+library(ergm)
+
+g <- read.table("mygraph.edgelist")
+net <- network(g, directed = FALSE)
+
+
+
+# Ajustar modelo con términos "edges" y "triangles"
+fit <- ergm(net ~ edges + gwesp(0.5, fixed = TRUE))
+
+summary(fit)
+```
