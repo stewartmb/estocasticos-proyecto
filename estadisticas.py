@@ -59,6 +59,13 @@ def calcular_estadisticas_de_red(G):
     stats['gwesp'] = gwesp_statistic(G)
     stats['gwd'] = gwd_statistic(G)
 
+    grados = [grado for nodo, grado in G.degree()]
+
+    stats['degree<4'] = sum((4-g) for g in grados if g < 4)
+    stats['degree>4'] = sum((g-4) for g in grados if g > 4)
+
+    stats['transitivity'] = nx.transitivity(G)
+
     return stats
 
 

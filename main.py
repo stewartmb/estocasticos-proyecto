@@ -7,11 +7,11 @@ import copy
 from params import *
 
 
-n = 46           # Número de nodos en el grafo
+n = 25           # Número de nodos en el grafo
 p = 0.2          # Probabilidad inicial de conexión
 iteraciones = 5000  # Número de modificaciones aleatorias
 
-params = r_params # Parámetros iniciales
+params = g30 # Parámetros iniciales
 
 def change(G_propuesto):
     # Proponer un cambio: añadir o quitar una arista

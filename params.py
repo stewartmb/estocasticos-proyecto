@@ -83,8 +83,34 @@ distant = {
 
 
 
-
 r_params = {
-    'edges': -3.3,
-    'gwesp': 0.8
+    'edges': -3.2411,
+    'gwesp': 0.8339,
+}
+
+g46 = {
+    'edges': -3.8893,
+    'gwesp': 1.0871,
+    'gwd': 6.2551,
+}
+
+g50 = {
+    'edges': -11.9808,
+    'gwesp': 2.7129,
+    'gwd': 485.3342,
+    'degree<4': -10,
+    'degree>4': -50,
+    'transitivity': 100,
+}
+
+g25 = {
+    'edges': -0.5464,
+    'gwesp': 0.3483,
+    'gwd': 22.4689,
+}
+
+g30 = {
+    'edges': -2.4675,
+    'gwesp': -0.1263,
+    'gwd': 1.5929,
 }
